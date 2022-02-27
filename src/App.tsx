@@ -6,38 +6,12 @@ import Meal, { MealType } from "./Meal";
 import type { IngredientType } from "./Ingredient";
 import useLocalStorageState from "./hooks/useLocalStorage";
 
-// const ingredients: IngredientType[] = [
-// {
-//   id: "001",
-//   name: "Something",
-//   chPerGram: 0.42,
-// },
-//   {
-//     id: "002",
-//     name: "Onions",
-//     chPerGram: 0.2,
-//   },
-// ];
-
 function App() {
-  // const [grams, setGrams] = React.useState("");
   const [ingredients, setIngredients] = useLocalStorageState(
     "ktCHn-ingredients",
     []
   );
   const [meals, setMeals] = useLocalStorageState("ktCHn-meals", []);
-
-  // const chAmount = grams && ingredients[0].chPerGram * Number(grams);
-
-  // const handleGramsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setGrams(event.target.value);
-  // };
-
-  // const handleCHChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const targetCH = event.target.value;
-  //   const newGrams = targetCH && Number(targetCH) / ingredients[0].chPerGram;
-  //   setGrams(`${newGrams}`);
-  // };
 
   const handleIngredientChanged = (ingredient: IngredientType) => {
     const ingredientsCopy = [...ingredients] as IngredientType[];
@@ -113,24 +87,6 @@ function App() {
         />
       ))}
       <button onClick={handleAddNewMeal}>Add new meal</button>
-      {/* <label>
-        Grams
-        <input
-          name="Grams"
-          type="number"
-          value={grams}
-          onChange={handleGramsChange}
-        />
-      </label>
-      <label>
-        CH
-        <input
-          name="ch"
-          type="number"
-          value={chAmount}
-          onChange={handleCHChange}
-        />
-      </label> */}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import { roundToTwoDigits } from "./utils";
 
 export type IngredientType = {
   id: string;
@@ -23,7 +24,6 @@ const Ingredient = (props: IngredientProps) => {
   };
 
   const handleCHChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
     const chPerGram = event.target.value
       ? Number(event.target.value) / 100
       : undefined;
@@ -48,7 +48,11 @@ const Ingredient = (props: IngredientProps) => {
         CH in 100 grams
         <input
           type="number"
-          value={(ingredient.chPerGram && ingredient.chPerGram * 100) ?? ""}
+          value={
+            (ingredient.chPerGram &&
+              roundToTwoDigits(ingredient.chPerGram * 100)) ??
+            ""
+          }
           onChange={handleCHChange}
         />
       </label>

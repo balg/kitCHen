@@ -1,6 +1,7 @@
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { IngredientType } from "./Ingredient";
+import { roundToTwoDigits } from "./utils";
 
 type MealIngredient = {
   id: string;
@@ -12,6 +13,7 @@ export type MealType = {
   id: string;
   name?: string;
   ingredients?: MealIngredient[];
+  grams?: number;
 };
 
 export interface MealProps {
@@ -23,6 +25,25 @@ export interface MealProps {
 
 const Meal = (props: MealProps) => {
   const { meal, ingredients, onChange, onRemove } = props;
+
+  const [portionWeight, setPortionWeight] = React.useState<number>();
+
+  const totalCH = meal.ingredients?.reduce((acc, mealIngredient) => {
+    const ingredient = ingredients.find(
+      (i) => i.id === mealIngredient.ingredientId
+    );
+
+    acc += (mealIngredient.grams || 0) * (ingredient?.chPerGram || 0);
+    return acc;
+  }, 0);
+
+  const mealCHperGram =
+    (meal.grams && totalCH && Number(totalCH) / meal.grams) || 0;
+
+  const portionCH =
+    portionWeight &&
+    mealCHperGram &&
+    Number(portionWeight) * Number(mealCHperGram);
 
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange({
@@ -76,6 +97,25 @@ const Meal = (props: MealProps) => {
       ...meal,
       ingredients: mealIngredientsCopy,
     });
+  };
+
+  const handleTotalNetWeightChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    onChange({
+      ...meal,
+      grams: event.target.value ? Number(event.target.value) : undefined,
+    });
+  };
+
+  const handleCHChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const targetCH = event.target.value;
+    if (!targetCH) {
+      setPortionWeight(undefined);
+    }
+
+    const newGrams = Number(targetCH) / mealCHperGram;
+    setPortionWeight(newGrams);
   };
 
   return (
@@ -138,6 +178,47 @@ const Meal = (props: MealProps) => {
             </div>
           );
         })}
+      </div>
+      <div>
+        <h3>CH content</h3>
+        <div>Total: {totalCH ?? 0}</div>
+        <label>
+          Total net weight (without plate)
+          <input
+            type="number"
+            value={meal.grams ?? ""}
+            onChange={handleTotalNetWeightChange}
+          />
+          grams
+        </label>
+        <br />
+        <label>
+          Portion
+          <input
+            name="Grams"
+            type="number"
+            value={
+              (portionWeight && roundToTwoDigits(Number(portionWeight))) ?? ""
+            }
+            onChange={(event) =>
+              setPortionWeight(
+                event.target.value ? Number(event.target.value) : undefined
+              )
+            }
+          />
+          grams
+        </label>
+        <br />
+        <label>
+          CH
+          <input
+            name="ch"
+            type="number"
+            value={portionCH ?? ""}
+            onChange={handleCHChange}
+          />
+          grams
+        </label>
       </div>
       <button onClick={() => onRemove(meal.id)}>Delete</button>
     </div>
