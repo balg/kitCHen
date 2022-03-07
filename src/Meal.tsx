@@ -214,7 +214,7 @@ const Meal = (props: MealProps) => {
           <input
             name="ch"
             type="number"
-            value={portionCH ?? ""}
+            value={(portionCH && roundToTwoDigits(portionCH)) ?? ""}
             onChange={handleCHChange}
           />
           grams
