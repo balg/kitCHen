@@ -1,7 +1,10 @@
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
+import styled from "styled-components";
 import type { IngredientType } from "./Ingredient";
 import { roundToTwoDigits } from "./utils";
+import colors from "./styles/colors";
+import UnstyledButton from "./components/UnstyledButton";
 
 type MealIngredient = {
   id: string;
@@ -21,6 +24,7 @@ export interface MealProps {
   ingredients: IngredientType[];
   onChange: (meal: MealType) => any;
   onRemove: (id: string) => any;
+  initialEditMode?: boolean;
 }
 
 const Meal = (props: MealProps) => {
@@ -119,23 +123,22 @@ const Meal = (props: MealProps) => {
   };
 
   return (
-    <div>
-      <div>
-        <label>
-          Name{" "}
-          <input
-            type="text"
-            value={meal.name ?? ""}
-            onChange={handleNameChange}
-          />
-        </label>
-      </div>
-      <div>
-        <h3>Ingredients</h3>
-        <button onClick={handleAddNewMealIngredient}>Add</button>
+    <Wrapper>
+      <Heading>
+        <NameInput
+          type="text"
+          value={meal.name ?? ""}
+          placeholder="Név"
+          onChange={handleNameChange}
+        />
+        <Actions>
+          <ActionButton onClick={() => onRemove(meal.id)}>töröl</ActionButton>
+        </Actions>
+      </Heading>
+      <ul>
         {meal.ingredients?.map((mealIngredient) => {
           return (
-            <div key={mealIngredient.id}>
+            <li key={mealIngredient.id}>
               <select
                 value={mealIngredient.ingredientId || ""}
                 onChange={(event) =>
@@ -156,8 +159,7 @@ const Meal = (props: MealProps) => {
               </select>
 
               <label>
-                Grams{" "}
-                <input
+                <WeightInput
                   type="number"
                   value={mealIngredient.grams ?? ""}
                   onChange={(event) => {
@@ -168,17 +170,23 @@ const Meal = (props: MealProps) => {
                     );
                   }}
                 />
+                g
               </label>
 
-              <button
+              <ActionButton
                 onClick={() => handleMealIngredientRemoved(mealIngredient.id)}
               >
-                Delete
-              </button>
-            </div>
+                töröl
+              </ActionButton>
+            </li>
           );
         })}
-      </div>
+        <li>
+          <ActionButton onClick={handleAddNewMealIngredient}>
+            új hozzávaló
+          </ActionButton>
+        </li>
+      </ul>
       <div>
         <h3>CH content</h3>
         <div>Total: {totalCH ?? 0}</div>
@@ -220,9 +228,40 @@ const Meal = (props: MealProps) => {
           grams
         </label>
       </div>
-      <button onClick={() => onRemove(meal.id)}>Delete</button>
-    </div>
+    </Wrapper>
   );
 };
+
+const Wrapper = styled.div`
+  padding: 16px;
+  border-bottom: 1px solid ${colors.grey};
+`;
+
+const Heading = styled.div`
+  display: flex;
+  align-items: baseline;
+`;
+
+const Actions = styled.div`
+  margin-left: auto;
+`;
+
+const ActionButton = styled(UnstyledButton)`
+  text-decoration: underline;
+`;
+
+const TextInput = styled.input`
+  border: none;
+  border-bottom: 1px solid ${colors.grey};
+`;
+
+const NameInput = styled(TextInput)`
+  font-size: 1.17rem;
+  font-weight: bold;
+`;
+
+const WeightInput = styled(TextInput)`
+  width: 6ch;
+`;
 
 export default Meal;
