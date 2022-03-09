@@ -3,8 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 import styled from "styled-components";
 import type { IngredientType } from "./Ingredient";
 import { roundToTwoDigits } from "./utils";
-import colors from "./styles/colors";
+import { colors, spacing } from "./styles/constants";
 import UnstyledButton from "./components/UnstyledButton";
+import DeleteButton from "./components/DeleteButton";
 
 type MealIngredient = {
   id: string;
@@ -132,52 +133,56 @@ const Meal = (props: MealProps) => {
           onChange={handleNameChange}
         />
         <Actions>
-          <ActionButton onClick={() => onRemove(meal.id)}>töröl</ActionButton>
+          <DeleteButton onDelete={() => onRemove(meal.id)}>töröl</DeleteButton>
         </Actions>
       </Heading>
-      <ul>
+      <IngredientList>
         {meal.ingredients?.map((mealIngredient) => {
           return (
             <li key={mealIngredient.id}>
-              <select
-                value={mealIngredient.ingredientId || ""}
-                onChange={(event) =>
-                  handleMealIngredientChanged(
-                    mealIngredient.id,
-                    "ingredientId",
-                    event.target.value
-                  )
-                }
-                required
-              >
-                <option value=""></option>
-                {ingredients.map((ingredient) => (
-                  <option key={ingredient.id} value={ingredient.id}>
-                    {ingredient.name}
-                  </option>
-                ))}
-              </select>
-
-              <label>
-                <WeightInput
-                  type="number"
-                  value={mealIngredient.grams ?? ""}
-                  onChange={(event) => {
+              <IngredientWrapper>
+                <select
+                  value={mealIngredient.ingredientId || ""}
+                  onChange={(event) =>
                     handleMealIngredientChanged(
                       mealIngredient.id,
-                      "grams",
+                      "ingredientId",
                       event.target.value
-                    );
-                  }}
-                />
-                g
-              </label>
+                    )
+                  }
+                  required
+                >
+                  <option value=""></option>
+                  {ingredients.map((ingredient) => (
+                    <option key={ingredient.id} value={ingredient.id}>
+                      {ingredient.name}
+                    </option>
+                  ))}
+                </select>
 
-              <ActionButton
-                onClick={() => handleMealIngredientRemoved(mealIngredient.id)}
-              >
-                töröl
-              </ActionButton>
+                <label>
+                  <WeightInput
+                    type="number"
+                    value={mealIngredient.grams ?? ""}
+                    onChange={(event) => {
+                      handleMealIngredientChanged(
+                        mealIngredient.id,
+                        "grams",
+                        event.target.value
+                      );
+                    }}
+                  />
+                  g
+                </label>
+
+                <DeleteButton
+                  onDelete={() =>
+                    handleMealIngredientRemoved(mealIngredient.id)
+                  }
+                >
+                  töröl
+                </DeleteButton>
+              </IngredientWrapper>
             </li>
           );
         })}
@@ -186,23 +191,24 @@ const Meal = (props: MealProps) => {
             új hozzávaló
           </ActionButton>
         </li>
-      </ul>
+      </IngredientList>
       <div>
-        <h3>CH content</h3>
-        <div>Total: {totalCH ?? 0}</div>
+        Összesen <b>{(totalCH && roundToTwoDigits(totalCH)) ?? 0}g</b>{" "}
+        szénhidrát
+      </div>
+      <label>
+        Nettó tömeg (tányér nélkül):{" "}
+        <WeightInput
+          type="number"
+          value={meal.grams ?? ""}
+          onChange={handleTotalNetWeightChange}
+        />
+        g
+      </label>
+      <CalculatorWrapper>
         <label>
-          Total net weight (without plate)
-          <input
-            type="number"
-            value={meal.grams ?? ""}
-            onChange={handleTotalNetWeightChange}
-          />
-          grams
-        </label>
-        <br />
-        <label>
-          Portion
-          <input
+          Adag:{" "}
+          <WeightInput
             name="Grams"
             type="number"
             value={
@@ -214,32 +220,36 @@ const Meal = (props: MealProps) => {
               )
             }
           />
-          grams
+          g
         </label>
         <br />
         <label>
-          CH
-          <input
+          CH:{" "}
+          <WeightInput
             name="ch"
             type="number"
             value={(portionCH && roundToTwoDigits(portionCH)) ?? ""}
             onChange={handleCHChange}
           />
-          grams
+          g
         </label>
-      </div>
+      </CalculatorWrapper>
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
-  padding: 16px;
+  padding: ${spacing[1]}px;
   border-bottom: 1px solid ${colors.grey};
 `;
 
-const Heading = styled.div`
+const FlexWrapper = styled.div`
   display: flex;
   align-items: baseline;
+`;
+
+const Heading = styled(FlexWrapper)`
+  margin-bottom: ${spacing[1]}px;
 `;
 
 const Actions = styled.div`
@@ -261,7 +271,21 @@ const NameInput = styled(TextInput)`
 `;
 
 const WeightInput = styled(TextInput)`
-  width: 6ch;
+  width: 8ch;
+  text-align: end;
+`;
+
+const IngredientList = styled.ul`
+  margin-bottom: ${spacing[0]}px;
+`;
+
+const IngredientWrapper = styled(FlexWrapper)`
+  gap: ${spacing[0]}px;
+  padding: 2px 0px;
+`;
+
+const CalculatorWrapper = styled(FlexWrapper)`
+  gap: ${spacing[2]}px;
 `;
 
 export default Meal;

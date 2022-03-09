@@ -1,10 +1,13 @@
 import React from "react";
+import styled from "styled-components";
 import { v4 as uuidv4 } from "uuid";
 import Ingredient from "./Ingredient";
 import Meal, { MealType } from "./Meal";
 
 import type { IngredientType } from "./Ingredient";
 import useLocalStorageState from "./hooks/useLocalStorage";
+import UnstyledButton from "./components/UnstyledButton";
+import { spacing } from "./styles/constants";
 
 function App() {
   const [ingredients, setIngredients] = useLocalStorageState(
@@ -27,10 +30,10 @@ function App() {
 
   const handleAddNewIngredient = () => {
     setIngredients([
-      ...ingredients,
       {
         id: uuidv4(),
       },
+      ...ingredients,
     ]);
   };
 
@@ -52,10 +55,10 @@ function App() {
 
   const handleAddNewMeal = () => {
     setMeals([
-      ...meals,
       {
         id: uuidv4(),
       },
+      ...meals,
     ]);
   };
 
@@ -65,7 +68,10 @@ function App() {
 
   return (
     <div>
-      <h2>Ingredients</h2>
+      <SectionHeader>
+        <h2>Alapanyagok</h2>
+        <AddButton onClick={handleAddNewIngredient}>Új</AddButton>
+      </SectionHeader>
       {ingredients.map((ingredient: IngredientType) => (
         <Ingredient
           key={ingredient.id}
@@ -74,9 +80,11 @@ function App() {
           onRemove={handleIngredientRemoved}
         />
       ))}
-      <button onClick={handleAddNewIngredient}>Add new ingredient</button>
 
-      <h2>Meals</h2>
+      <SectionHeader>
+        <h2>Ételek</h2>
+        <AddButton onClick={handleAddNewMeal}>Új</AddButton>
+      </SectionHeader>
       {meals.map((meal: MealType) => (
         <Meal
           key={meal.id}
@@ -86,9 +94,20 @@ function App() {
           onRemove={handleMealRemoved}
         />
       ))}
-      <button onClick={handleAddNewMeal}>Add new meal</button>
     </div>
   );
 }
+
+const SectionHeader = styled.div`
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: ${spacing[1]}px;
+`;
+
+const AddButton = styled(UnstyledButton)`
+  text-decoration: underline;
+  font-size: ${18 / 16}rem;
+`;
 
 export default App;
